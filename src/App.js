@@ -1,23 +1,34 @@
-import logo from './logo.svg';
+
+import { useState , useEffect } from 'react';
 import './App.css';
+import PokeList from './PokeList';
+import axios from 'axios';
+import PageToggler from './PageToggler';
 
 function App() {
+  const [pokemon,setPokemon] = useState([]);
+  
+  const [loading, setLoading] = useState(true)
+  
+  
+
+  useEffect(() => {
+    setLoading(true);
+    axios.get("https://pokeapi.co/api/v2/pokemon").then(res => {
+      setLoading(false);
+      res.data.results.forEach(poke => {
+        axios.get(poke.url).then(response => {
+          setPokemon(currentList => [...currentList,response.data])
+        })
+      })
+    })
+    
+  },[]);
+  if(loading) return "Loadging mighty pokemons!"
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+    <PokeList pokemon={pokemon}/>
     </div>
   );
 }
